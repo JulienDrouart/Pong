@@ -24,14 +24,21 @@ def loopFunction():
     opponentCooX = 460
     direction = "null"
 
+    counterBeforeBonus = 2
+
     ballSpeed = 3
     ballCooX = 300
     ballCooY = 255
     ballDirectionX = ballDirectionY = 0
 
+    bonusCooX = 2000
+    bonusCooY = 2000
     playerScore = opponentScore = 0
 
+    bonusOccuring = False
+
     pygame.draw.line(screen, (125, 125, 125), (300, 0), (300, 600), 1)
+    pygame.draw.circle(screen, (255, 255, 255), (ballCooX, ballCooY), 10)
     pygame.draw.circle(screen, (255, 255, 255), (ballCooX, ballCooY), 10)
     pygame.draw.rect(screen, (255, 255, 255), Rect(20, playerCooY, 10, 50))
     pygame.draw.rect(screen, (255, 255, 255), Rect(570, opponnentCooY, 10, 50))
@@ -65,11 +72,10 @@ def loopFunction():
                     if start is False:
                         start = True
                         ballDirection = randint(0, 1)
-                        ballDirectionY = random.randrange(-2, 2)
-                        ballDirectionY = randint(1,3)
-                        ballDirectionYAngle = randint(0,1)
+                        ballDirectionY = randint(1.0, 3.0)
+                        ballDirectionYAngle = randint(0, 1)
                         if ballDirectionYAngle == 0:
-                            ballDirectionY = ballDirectionY*-1
+                            ballDirectionY = ballDirectionY * -1
                     if event.key == pygame.K_UP:
                         direction = "up"
                     if event.key == pygame.K_DOWN:
@@ -93,6 +99,7 @@ def loopFunction():
                 pygame.draw.circle(screen, (255, 255, 255), (ballCooX, ballCooY), 10)
                 pygame.draw.rect(screen, (255, 255, 255), Rect(20, playerCooY, 10, 50))
                 pygame.draw.rect(screen, (255, 255, 255), Rect(570, opponnentCooY, 10, 50))
+                pygame.draw.circle(screen, (255, 228, 54), (bonusCooX, bonusCooY), 10)
                 playerScoreText = font.render(str(playerScore), True, (255, 255, 255))
                 opponentScoreText = font.render(str(opponentScore), True, (255, 255, 255))
                 screen.blit(playerScoreText, (400, 20))
@@ -104,13 +111,13 @@ def loopFunction():
                 if ballCooY < 0 or ballCooY > 495:
                     ballDirectionY *= -1
 
-
-
                 # Collision avec les curseurs
                 if Rect.colliderect(Rect(ballCooX, ballCooY, 10, 10), Rect(20 + 10, playerCooY, 10, 50)):
                     ballDirection = 1
+                    counterBeforeBonus -= 1
                 if Rect.colliderect(Rect(ballCooX + 10, ballCooY, 10, 10), Rect(570, opponnentCooY, 10, 50)):
                     ballDirection = 0
+                    counterBeforeBonus -= 1
 
                 # Collision avec l'opponent
                 if ballCooX > 595:
@@ -123,6 +130,8 @@ def loopFunction():
                     ballDirectionYAngle = randint(0, 1)
                     if ballDirectionYAngle == 0:
                         ballDirectionY = ballDirectionY * -1
+                    ballSpeed = 3
+                    opponentSpeed = 4
                     time.sleep(1)
                 # Collision avec le joueur
                 if ballCooX < 0:
@@ -130,11 +139,13 @@ def loopFunction():
                     ballCooX = 300
                     ballCooY = 255
                     ballDirection = randint(0, 1)
-                    ballDirectionY = random.randrange(-2, 2)
-                    ballDirectionY = randint(1, 3)
+                    ballDirectionY = randint(1.0, 3.0)
                     ballDirectionYAngle = randint(0, 1)
+
                     if ballDirectionYAngle == 0:
                         ballDirectionY = ballDirectionY * -1
+                    ballSpeed = 3
+                    opponentSpeed = 4
                     time.sleep(1)
 
                 # Mouvement de l'opponent
@@ -142,6 +153,43 @@ def loopFunction():
                     opponnentCooY += opponentSpeed
                 if opponnentCooY + 50 > ballCooY + 10:
                     opponnentCooY -= opponentSpeed
+
+                bonusCooX -= 1
+
+                if counterBeforeBonus == 0:
+                    counterBeforeBonus = 5
+                    bonusCooX = 295
+                    bonusCooY = randint(0, 495)
+                    ballSpeed += 0.5
+                if bonusOccuring == True:
+                    time.sleep(1)
+                    bonusOccuring = False
+
+                if Rect.colliderect(Rect(playerCooX-15, playerCooY, 10, 50), Rect(bonusCooX, bonusCooY, 10, 10)):
+                    opponentSpeed = 4
+                    bonusEffect = randint(0, 4)
+                    bonusCooX = 2000
+                    if bonusEffect == 0:
+                        ballSpeed -= 2
+                        bonusText = font.render(str("ball slowed"), True, (255, 0, 0))
+                        screen.blit(bonusText, (400, 20))
+                    if bonusEffect == 1:
+                        opponentSpeed = 1
+                        bonusText = font.render(str("opponent slowed"), True, (255, 0, 0))
+                        screen.blit(bonusText, (400, 20))
+                    if bonusEffect == 2:
+                        opponentSpeed = 1
+                        bonusText = font.render(str("opponent slowed"), True, (255, 0, 0))
+                        screen.blit(bonusText, (400, 20))
+                    if bonusEffect == 3:
+                        opponentSpeed = 1
+                        bonusText = font.render(str("opponent slowed"), True, (255, 0, 0))
+                        screen.blit(bonusText, (400, 20))
+                    if bonusEffect == 4:
+                        opponentSpeed = 1
+                        bonusText = font.render(str("opponent slowed"), True, (255, 0, 0))
+                        screen.blit(bonusText, (400, 20))
+                    bonusOccuring = True
         clock.tick(60)
         pygame.display.flip()
 
